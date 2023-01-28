@@ -1,0 +1,19 @@
+{
+	"name": "dmai",
+	"title": "DM AI",
+	"description": "Using AI to assist DMs with story telling",
+  	"authors": [
+	    {
+      		"name": "DarthCluck",
+		    "url": "https://github.com/adougherty",
+		    "discord": "DarthCluck#0001",
+		    "flags": {}
+	    }
+  	],
+	"version": "0.0.1",
+	"minimumCoreVersion": "10",
+	"compatibleCoreVersion": "10",
+  	"scripts": [
+    	"scripts/dmai.js"
+  	]
+}
