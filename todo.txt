@@ -1,0 +1,10 @@
+TODO
+
+* Use a different AI prompt with self spells and buffs, such as Mirror Image, and Bless
+* Do version checking on the server to run the appropriate response when an outdated client makes a request (perhaps just respond to update their module)
+* Add a way for the DM to set pronouns for Characters. (Default they/them).
+* What happens with spells such as Light?
+* Can reactions be factored in?
+* Use a loading icon on a chat card
+* Option to enable/disable module
+* Option to whisper to GM, or go public with responses.

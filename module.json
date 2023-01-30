@@ -1,23 +1,24 @@
 {
-	"name": "dmai",
-	"title": "DM AI",
-	"description": "Using AI to assist DMs with story telling",
-  	"authors": [
-	    {
-      		"name": "DarthCluck",
-		    "url": "https://github.com/adougherty",
-		    "discord": "DarthCluck#0001",
-		    "flags": {}
-	    }
-  	],
-	"version": "0.0.1",
-	"minimumCoreVersion": "10",
-	"compatibleCoreVersion": "10",
-  	"scripts": [
-    	"scripts/dmai.js"
-  	],
-  	"manifest": "https://raw.githubusercontent.com/adougherty/dmai/main/module.json",
-  	"download": "https://github.com/adougherty/dmai/archive/refs/heads/main.zip",
-  	"url": "https://github.com/adougherty/dmai/",
-  	"id": "dmai"
+  "title": "DM AI",
+  "description": "Using AI to assist DMs with story telling",
+  "authors": [
+    {
+      "name": "DarthCluck",
+      "url": "https://github.com/adougherty",
+      "discord": "DarthCluck#0001",
+      "flags": {}
+    }
+  ],
+  "version": "0.0.2",
+  "scripts": [
+    "scripts/dmai.js"
+  ],
+  "manifest": "https://raw.githubusercontent.com/adougherty/dmai/main/module.json",
+  "download": "https://github.com/adougherty/dmai/archive/refs/heads/main.zip",
+  "url": "https://github.com/adougherty/dmai/",
+  "id": "dmai",
+  "compatibility": {
+    "minimum": "10",
+    "verified": "10"
+  }
 }

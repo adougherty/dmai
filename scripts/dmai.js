@@ -1,37 +1,39 @@
 Hooks.on("midi-qol.RollComplete", async (workflow)=>{
     console.log(workflow);
 
-    if (workflow.item.type != 'weapon')
-        return;
+    switch (workflow.item.type) {
+        case 'weapon': await useWeapon(workflow); break;
+        case 'feat': await useWeapon(workflow); break;
+        case 'spell': await useWeapon(workflow); break;
+    }
 
+});
+
+async function useWeapon(workflow) {
     let actor = workflow.actor;
 
-    let targets = [];
-    for (const item of workflow.targets) {
-        targets.push(item.document)
-    }
-
+    let targets = getTargets(workflow);
+    let hits = getHitTargets(workflow, targets);
+    let deaths = getKilledTargets(workflow, targets);
+    let applications = getApplicationTargets(workflow, targets);
     let weapon = workflow.item.name;
-    let hits = []
-    for (const item of workflow.hitTargets) {
-        hits.push(item.document);
-        if (targets.includes(item.document.actorId))
-            hits.push(item.document);
-    }
 
-    console.log("Name1: " + actor.name);
-    console.log("Name2: " + targets[0].name);
-    console.log("Weapon: " + weapon);
-    console.log(targets);
-    console.log(hits);
-    let hit = (hits.length > 0 && targets[0].actorId === hits[0].actorId) ? 1 : 0;
-    let death = (hit && workflow.damageList && workflow.damageList[0].newHP <= 0) ? 1 : 0;
-    console.log("Hits: " + hit);
-    console.log("Death: " + death);
+    let targetNames = [];
+    targets.forEach(target => {
+        targetNames.push(target.name);
+    });
+    let sTargets = targetNames.join(',');
+    let hit = hits.join(',');
+    let death = deaths.join(',');
+    let application = applications.join(',');
+    console.log(death);
+    console.log(applications);
 
-    await $.get(`https://dmscreen.net/openai/complete.php?name1=${actor.name}&name2=${targets[0].name}&weapon=${weapon}&death=${death}&hit=${hit}`, json => {
-        console.log(json);
+    let useHits = (workflow.damageList) ? hit : application;
 
+    let uri = encodeURI(`https://dmscreen.net/openai/complete.php?name1=${actor.name}&name2=${targetNames}&weapon=${weapon}&death=${death}&hit=${useHits}`);
+    await $.get(uri, json => {
+        //console.log(json);
         let chatData = {
             user: game.user._id,
             speaker: ChatMessage.getSpeaker(),
@@ -39,28 +41,62 @@ Hooks.on("midi-qol.RollComplete", async (workflow)=>{
         };
         ChatMessage.create(chatData, {});
     });
+}
 
+async function useFeat(workflow) {
+    let actor = workflow.actor;
+    let targets = getTargets(workflow);
 
+    if (targets.length > 1) {
 
+    }
+}
 
-    /*
-    console.log(workflow.actor.name);
-    console.log(workflow.advantage);
-    console.log(workflow.hitTargets.size);
-    console.log(workflow.hitTargets);
-    console.log(workflow.targets)
-    console.log(workflow.targets.size);
-    console.log("Targets:")
+function getHitTargets(workflow, targets) {
+    let hits = []
+    for (const item of targets) {
+        let found = workflow.hitTargets.filter(el => {
+            return el.document.actorId == item.actorId;
+        });
+        
+        hits.push(found.size);
+    }
+    return hits;
+}
+
+function getKilledTargets(workflow, targets) {
+    if (!workflow.damageList)
+        return [];
+
+    let killed = [];
+    for (const item of targets) {
+        let found = workflow.damageList.filter(el => {
+            return el.actorId == item.actorId && el.newHP <= 0;
+        })
+        killed.push(found.length);
+    }
+    return killed;
+}
+
+function getApplicationTargets(workflow, targets) {
+    if (!workflow.applicationTargets)
+        return [];
+
+    let appt = []
+    for (const item of targets) {
+        let found = workflow.applicationTargets.filter(el => {
+            return el.document.actorId == item.actorId;
+        });
+        
+        appt.push(found.size);
+    }
+    return appt;
+}
+
+function getTargets(workflow) {
+    let targets = [];
     for (const item of workflow.targets) {
-        console.log(item.document.name);
+        targets.push(item.document)
     }
-    console.log("Hits:")
-    for (const item of workflow.hitTargets) {
-        console.log(item.document.name);
-    }
-    console.log(workflow.isCritical);
-    console.log(workflow.isFumble);
-    console.log(workflow.item.name);
-    console.log(workflow.autoRollAttack);
-    */
-});
+    return targets;    
+}
