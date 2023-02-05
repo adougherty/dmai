@@ -18,28 +18,22 @@ async function useWeapon(workflow) {
     let applications = getApplicationTargets(workflow, targets);
     let weapon = workflow.item.name;
 
-    let targetNames = [];
-    targets.forEach(target => {
-        targetNames.push(target.name);
-    });
-    let sTargets = targetNames.join(',');
-    let hit = hits.join(',');
-    let death = deaths.join(',');
-    let application = applications.join(',');
-    console.log(death);
-    console.log(applications);
+    let targetNames = targets.map(target => target.name);
 
-    let useHits = (workflow.damageList) ? hit : application;
+    const api = new URL('https://dmscreen.net/openai/complete.php');
 
-    let uri = 'https://dmscreen.net/openai/complete.php?';
+    api.searchParams.append("name1", actor.name);
+    api.searchParams.append("name2", targetNames);
+    api.searchParams.append("weapon", weapon);
+    api.searchParams.append("hit", workflow.damageList ? hits : applications);
+    
     if (workflow.item.labels.damage == '') {
-        uri += `name1=${actor.name}&name2=${targetNames}&weapon=${weapon}&type=buff&hit=${useHits}`;
+        api.searchParams.append("type", "buff");
     } else {
-        uri += `name1=${actor.name}&name2=${targetNames}&weapon=${weapon}&death=${death}&hit=${useHits}`;
+        api.searchParams.append("death", deaths);
     }
 
-    uri = encodeURI(uri);
-    await $.get(uri, json => {
+    await $.get(api, json => {
         //console.log(json);
         let chatData = {
             user: game.user._id,
