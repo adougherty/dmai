@@ -31,7 +31,14 @@ async function useWeapon(workflow) {
 
     let useHits = (workflow.damageList) ? hit : application;
 
-    let uri = encodeURI(`https://dmscreen.net/openai/complete.php?name1=${actor.name}&name2=${targetNames}&weapon=${weapon}&death=${death}&hit=${useHits}`);
+    let uri = 'https://dmscreen.net/openai/complete.php?';
+    if (workflow.item.labels.damage == '') {
+        uri += `name1=${actor.name}&name2=${targetNames}&weapon=${weapon}&type=buff&hit=${useHits}`;
+    } else {
+        uri += `name1=${actor.name}&name2=${targetNames}&weapon=${weapon}&death=${death}&hit=${useHits}`;
+    }
+
+    uri = encodeURI(uri);
     await $.get(uri, json => {
         //console.log(json);
         let chatData = {
