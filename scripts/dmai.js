@@ -22,8 +22,25 @@ Hooks.on("renderActorSheet", (app, html, data) => {
     summaryElement[0].insertBefore(li, summaryElement[0].firstChild);
 });
 
-Hooks.on("updateActor", (actor, updateData) => {
-    console.log(updateData);
+Hooks.on('init', () => {
+    // Stop using the AI Features
+    game.settings.register('dmai', 'enableDMAI', {
+        name: game.i18n.localize("DMAI.settings.enableDMAI.name"),
+        hint: game.i18n.localize("DMAI.settings.enableDMAI.hint"),
+        scope: 'world',
+        config: true,
+        default: true,
+        type: Boolean,
+    });
+
+    game.settings.register('dmai', 'gmOnly', {
+        name: game.i18n.localize("DMAI.settings.gmOnly.name"),
+        hint: game.i18n.localize("DMAI.settings.gmOnly.hint"),
+        scope: 'world',
+        config: true,
+        default: false,
+        type: Boolean,
+    });
 });
 
 async function useWeapon(workflow) {
@@ -37,8 +54,6 @@ async function useWeapon(workflow) {
 
     let targetNames = targets.map(target => target.name);
     let targetPronouns = targets.map(target => target.actorData.flags.pronouns)
-    console.log(targetNames);
-    console.log(targetPronouns);
 
     const api = new URL('http://dmscreen.net:30001/openai/complete.php');
 
@@ -61,22 +76,27 @@ async function useWeapon(workflow) {
         let txt = response.text;
         if (game.modules.get("dmai").version !== response.client_version)
             txt = "<small><i>You are using an old version of DMAI. If you get unexpected results, please update the module</i></small><br/><br/>" + txt;
+
+        let whisper = [];
+        if (game.settings.get('dmai', 'gmOnly')) {
+            let gmID = game.users.find(u => u.isGM && u.active);
+            console.log(gmID);
+            if (gmID)
+                whisper.push(gmID);
+            else
+                return;
+        }
+
         let chatData = {
             user: game.user._id,
             speaker: ChatMessage.getSpeaker(),
-            content: txt
+            content: txt,
+            whisper: whisper
         };
         ChatMessage.create(chatData, {});
+
+
     });
-}
-
-async function useFeat(workflow) {
-    let actor = workflow.actor;
-    let targets = getTargets(workflow);
-
-    if (targets.length > 1) {
-
-    }
 }
 
 function getHitTargets(workflow, targets) {

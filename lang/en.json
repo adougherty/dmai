@@ -1,0 +1,6 @@
+{
+  "DMAI.settings.enableDMAI.name": "Enable DMAI",
+  "DMAI.settings.enableDMAI.hint": "Enable getting an AI generated description of combat.",
+  "DMAI.settings.gmOnly.name": "Show to GM Only",
+  "DMAI.settings.gmOnly.hint": "Hide the AI generated descriptions from the players.",
+}

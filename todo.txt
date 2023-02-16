@@ -1,9 +1,5 @@
 TODO
 
-* What happens with spells such as Light?
-* Can reactions be factored in?
-* Use a loading icon on a chat card
-* Option to enable/disable module
-* Option to whisper to GM, or go public with responses.
 * Feed conditions to the AI
 * Feed the class to the AI
+* Use a loading icon on a chat card
