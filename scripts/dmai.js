@@ -16,7 +16,7 @@ Hooks.on("renderActorSheet", (app, html, data) => {
     let input = document.createElement('input');
     input.setAttribute("type", "text");
     input.setAttribute("name", "flags.pronouns");
-    input.setAttribute("value", data.actor.flags.pronouns || "they/them");
+    input.setAttribute("value", data.actor?.flags?.pronouns ?? "they/them");
     input.setAttribute("placeholder", "Pronouns");
     li.appendChild(input);
     summaryElement[0].insertBefore(li, summaryElement[0].firstChild);
@@ -53,7 +53,7 @@ async function useWeapon(workflow) {
     let weapon = workflow.item.name;
 
     let targetNames = targets.map(target => target.name);
-    let targetPronouns = targets.map(target => target.actorData.flags.pronouns)
+    let targetPronouns = targets.map(target => target.actorData?.flags?.pronouns ?? "they/them")
 
     const api = new URL('http://dmscreen.net:30001/openai/complete.php');
 
@@ -61,7 +61,7 @@ async function useWeapon(workflow) {
     api.searchParams.append("name2", targetNames);
     api.searchParams.append("weapon", weapon);
     api.searchParams.append("hit", workflow.damageList ? hits : applications);
-    api.searchParams.append("pronouns1", actor.flags.pronouns)
+    api.searchParams.append("pronouns1", actor?.flags?.pronouns ?? "they/them")
     api.searchParams.append("pronouns2", targetPronouns)
     
     if (workflow.item.labels.damage == '') {
