@@ -9,8 +9,7 @@ Hooks.on("midi-qol.RollComplete", async (workflow)=>{
 });
 
 Hooks.on("renderActorSheet", (app, html, data) => {
-
-    console.log(data);
+    // Add Pronounce to character sheet
     let summaryElement = html.find(".summary.flexrow");
     let li = document.createElement('li');
     let input = document.createElement('input');
@@ -20,6 +19,17 @@ Hooks.on("renderActorSheet", (app, html, data) => {
     input.setAttribute("placeholder", "Pronouns");
     li.appendChild(input);
     summaryElement[0].insertBefore(li, summaryElement[0].firstChild);
+
+    if (data.actor.type == 'npc') {
+        // Add button to dScryb
+        let aiBtn = $(`<a class="dmai-dscryb"><i class="fa-solid fa-robot"></i>AI</a>`);
+        aiBtn.click(ev => {
+            showAIDescription(data.actor.name);
+        });
+        html.closest('.app').find('.dmai-dscryb').remove();
+        let titleElement = html.closest('.app').find('.window-title');
+        aiBtn.insertAfter(titleElement);
+    }
 });
 
 Hooks.on('init', () => {
@@ -43,6 +53,40 @@ Hooks.on('init', () => {
     });
 });
 
+async function showAIDescription(name) {
+    console.log(`Fetching description for ${name}`)
+    const api = new URL('http://68.224.63.210:30001/openai/dscryb.php');
+    api.searchParams.append("name", name);
+
+    await $.get(api, json => {
+        console.log(json);
+        let response = JSON.parse(json);
+        let txt = response.text.content;
+        console.log(txt);
+        txt = txt.replaceAll("\n","<br/>\n")
+        if (game.modules.get("dmai").version !== response.client_version)
+            txt = "<small><i>You are using an old version of DMAI. If you get unexpected results, please update the module</i></small><br/><br/>" + txt;
+
+        let whisper = [];
+        if (game.settings.get('dmai', 'gmOnly')) {
+            let gmID = game.users.find(u => u.isGM && u.active);
+            console.log(gmID);
+            if (gmID)
+                whisper.push(gmID);
+            else
+                return;
+        }
+
+        let chatData = {
+            user: game.user._id,
+            speaker: ChatMessage.getSpeaker(),
+            content: txt,
+            whisper: whisper
+        };
+        ChatMessage.create(chatData, {});
+    });
+}
+
 async function useWeapon(workflow) {
     let actor = workflow.actor;
 
@@ -55,7 +99,7 @@ async function useWeapon(workflow) {
     let targetNames = targets.map(target => target.name);
     let targetPronouns = targets.map(target => target.actorData.flags.pronouns)
 
-    const api = new URL('http://dmscreen.net:30001/openai/complete.php');
+    const api = new URL('http://68.224.63.210:30001/openai/complete.php');
 
     api.searchParams.append("name1", actor.name);
     api.searchParams.append("name2", targetNames);
