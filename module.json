@@ -9,7 +9,7 @@
       "flags": {}
     }
   ],
-  "version": "0.0.5",
+  "version": "0.0.6",
   "scripts": [
     "scripts/dmai.js"
   ],
